@@ -1,0 +1,14 @@
+{"dev": {
+  "aws_region": "us-west-2",
+  "app_function": "src.app.app",
+  "cors": true,
+  "keep_warm": false,
+  "log_level": "INFO",
+  "project_name": "FlaskDemo",
+  "memory_size": 256,
+  "runtime": "python3.7",
+  "s3_bucket": "zappa-deploy-lambda",
+  "slim_handler": true,
+  "timeout_seconds": 30
+  }
+}
