@@ -114,9 +114,23 @@ But that goes beyond the scope of this post.
  may not always work as expected.  To properly store state an external data store is needed (DynamoDB, RDS, S3).
 
 ### Serving static HTML content
+While I've mostly build REST APIs with Flask as a data sourcing layer between a database and a frontend client you can most
+certainly serve up any type of content you want, including rendered HTML templates.  It's possible to build entire websites 
+out of lambda functions with API Gateways and Application Load Balancers, although it can get a bt tricky if the site is 
+particularly dynamic or highly concurrent.
 
-### Persisting state in a database
+### Lambda Deployments: Persisting state in a database
+When persisting state in a flask application you have a few options. You can store items on the app itself, which will
+be global for the lifespan of that application instance.  The `request` object will also be globally present and will 
+contain all the information provided to the endpoint.  
+When someone wants to update what a cat says, we should make sure that all instances of our application are aware of this
+configuration change and will use the updated value.  The first three things that come to mind are:
+1. json in S3 - kinda slow, but straightforward to use. No concurrent transaction control.
+2. DynamoDb - interface is kinda cumbersome, but pretty easy to get off the ground
+3. RDS - decent amount of work to get going, higher administrative overhead
 
 ### Swagger documentation
+By putting a little more time up front documenting your Resource classes the `flask-restx` library can help generate great
+Swagger documents viewable in a web browser. <Example Here>
 
 ### Request validation strategies
