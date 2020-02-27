@@ -110,6 +110,14 @@ But that goes beyond the scope of this post.
  we'll just set up a basic deployment of a `'dev'` stage which will create an API Gateway pointing to a Lambda function 
  created from the source application code.
  
+ To deploy the lambda function for the first time, enter  
+ `zappa deploy dev`  
+ This will create the lambda handler and API Gateway, and will return the API Gateway URL in the output, which is now the
+ base URL for calls to any endpoints in the flask application.
+ 
+ If you want to update a previously deployed function, use the command  
+ `zappa update dev`  
+ 
  Note: As any call to the `flask_restful_demo` url could spawn a new lambda instance, the POST method of the `/cat` method
  may not always work as expected.  To properly store state an external data store is needed (DynamoDB, RDS, S3).
 
@@ -130,7 +138,7 @@ configuration change and will use the updated value.  The first three things tha
 3. RDS - decent amount of work to get going, higher administrative overhead
 
 ### Swagger documentation
-By putting a little more time up front documenting your Resource classes the `flask-restx` library can help generate great
+By putting a little more time up front documenting your Resource classes the [flask-restx](https://github.com/python-restx/flask-restx) library can help generate great
 Swagger documents viewable in a web browser. <Example Here>
 
 ### Request validation strategies
