@@ -4,6 +4,7 @@ WORKDIR /
 
 COPY src /src
 COPY main.py .
+COPY static /static
 COPY dockerrequirements.txt .
 
 RUN pip install --upgrade pip

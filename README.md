@@ -98,8 +98,8 @@ This will run an instance of the latest version of the flask_demo container in y
  be able to access at `http://0.0.0.0:5000/cat`.
  
 Once your applications are containerized, it becomes relatively straightforward to scale resources horizontally by adding
-more instances in services like AWS Elastic Container Service, or pick-your-favorite Kubernetes provider. But this goes 
-beyond the scope of this post.
+more instances in services like AWS Elastic Container Service, docker-compose, or pick-your-favorite Kubernetes provider. 
+But that goes beyond the scope of this post.
 
 ### Deploying to AWS Lambda wth Zappa
 [Zappa](https://github.com/Miserlou/Zappa) is an open-source python framework for building and deploying Lambda functions, with or without API Gateways attached
