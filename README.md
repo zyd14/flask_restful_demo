@@ -83,3 +83,11 @@ api.add_resource(Cat, '/cat')
 This just tied our `Cat` Resource to the /cat endpoint of the application server.  For instance, when running locally and
 with defaults, this endpoint will be available at http://127.0.0.1:5000/cat.  If deployed via a lambda function, a docker 
 image, or another hosting option your host name and port will need to change.
+
+### Serving static HTML content
+
+### Persisting state in a database
+
+### Swagger documentation
+
+### Request validation strategies
