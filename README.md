@@ -141,4 +141,20 @@ configuration change and will use the updated value.  The first three things tha
 By putting a little more time up front documenting your Resource classes the [flask-restx](https://github.com/python-restx/flask-restx) library can help generate great
 Swagger documents viewable in a web browser.`flask-restx` also provides request marshalling / validation among other features <Example Here>
 
+`flask-restx` is basically a lightweight wrapper around `flask-RESTful`, so to use it you just import your `Resource` class
+that was used to created endpoint Resource subclasses. It will automatically detect each endpoint and request option tied
+to an application namespace:
+
+```python
+def tie_resources():
+    from src.views import Cat, CatPics
+    ns_cat = api.namespace('cat')
+    ns_cat.add_resource(Cat, '/')
+    ns_cat.add_resource(CatPics, '/pics')
+```  
+Visiting the base URL for our application at http://0.0.0.0:5000/ will take you to the auto-generated Swagger page.  It 
+organizes your endpoints by the namespaces you have created from your Api object. To further enrich the documentation of 
+our endpoints you can use the @api.expect and @api.response wrappers around your GET / POST / PATCH methods to describe
+what data structure the endpoints are expecting and various types of possible responses.
+
 ### Request validation strategies

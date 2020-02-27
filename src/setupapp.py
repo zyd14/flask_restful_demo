@@ -11,9 +11,11 @@ if not app or not api:
     # Create restful API to which we will tie url endpoints and their views
     api = Api(app)
 
+
 def tie_resources():
     from src.views import Cat, CatPics
     ns_cat = api.namespace('cat')
-    ns_cat.add_resource(Cat, '/')
+    ns_cat.add_resource(Cat, '')
     ns_cat.add_resource(CatPics, '/pics')
+
 tie_resources()
