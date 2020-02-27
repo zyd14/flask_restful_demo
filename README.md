@@ -84,6 +84,35 @@ This just tied our `Cat` Resource to the /cat endpoint of the application server
 with defaults, this endpoint will be available at http://127.0.0.1:5000/cat.  If deployed via a lambda function, a docker 
 image, or another hosting option your host name and port will need to change.
 
+### Running in Docker
+A basic `Dockerfie` has been provided in the root directory which will install the source application into the root of 
+the container, then run the application via the `main.py` entrypoint when the docker container is run.  To build the 
+image run the following in a terminal window from the root of the project:
+
+```docker build -t flask_demo .```
+
+Once the container is built you can run it using the `docker run` command, and mapping your host port to the container's
+default flask port (5000). To do this you would run the following in the root of your project:
+```docker run -d -p 5000:5000 flask_demo```
+This will run an instance of the latest version of the flask_demo container in your local registry, which you should now
+ be able to access at `http://0.0.0.0:5000/cat`.
+ 
+Once your applications are containerized, it becomes relatively straightforward to scale resources horizontally by adding
+more instances in services like AWS Elastic Container Service, docker-compose, or pick-your-favorite Kubernetes provider. 
+But that goes beyond the scope of this post.
+
+### Deploying to AWS Lambda wth Zappa
+[Zappa](https://github.com/Miserlou/Zappa) is an open-source python framework for building and deploying Lambda functions, with or without API Gateways attached
+ to the. It has particularly good integration with Django and Flask applications, making it easy to turn existing web 
+ applications into serverless applications.  
+ By providing a `zappa_settings.json` file in the root of the project, one can configure a pretty wide variety of deployment
+ options, including auto load balancers, event handlers (very handy), exception handlers, and callback functions.  Here
+ we'll just set up a basic deployment of a `'dev'` stage which will create an API Gateway pointing to a Lambda function 
+ created from the source application code.
+ 
+ Note: As any call to the `flask_restful_demo` url could spawn a new lambda instance, the POST method of the `/cat` method
+ may not always work as expected.  To properly store state an external data store is needed (DynamoDB, RDS, S3).
+
 ### Serving static HTML content
 
 ### Persisting state in a database

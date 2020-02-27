@@ -1,4 +1,4 @@
-from flask import make_response, jsonify, request, Response
+from flask import make_response, jsonify, request, Response, send_from_directory
 from flask_restful import Resource
 
 
@@ -26,3 +26,7 @@ class Cat(Resource):
 
         return response
 
+class CatPics(Resource):
+
+    def get(self):
+        return send_from_directory('static', 'kitty.png')
