@@ -1,5 +1,6 @@
 from flask import make_response, jsonify, request, Response, send_from_directory
-from flask_restful import Resource
+from flask_restx import Resource, fields
+from src.app import api, cat_model
 
 
 class Cat(Resource):
@@ -12,6 +13,7 @@ class Cat(Resource):
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
+    @api.marshal_with(cat_model)
     def post(self) -> Response:
 
         try:

@@ -137,8 +137,8 @@ configuration change and will use the updated value.  The first three things tha
 2. DynamoDb - interface is kinda cumbersome, but pretty easy to get off the ground
 3. RDS - decent amount of work to get going, higher administrative overhead
 
-### Swagger documentation
+### Swagger documentation and marshalling
 By putting a little more time up front documenting your Resource classes the [flask-restx](https://github.com/python-restx/flask-restx) library can help generate great
-Swagger documents viewable in a web browser. <Example Here>
+Swagger documents viewable in a web browser.`flask-restx` also provides request marshalling / validation among other features <Example Here>
 
 ### Request validation strategies
