@@ -1,6 +1,10 @@
 from flask import make_response, jsonify, request, Response, send_from_directory
 from flask_restx import Resource, fields
-from src.app import api, cat_model
+from src.setupapp import api
+
+cat_model = api.model('Model', {
+    "says": fields.String(readonly=True)
+})
 
 
 class Cat(Resource):
@@ -13,7 +17,7 @@ class Cat(Resource):
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
-    @api.marshal_with(cat_model)
+    @api.expect(cat_model)
     def post(self) -> Response:
 
         try:
@@ -28,7 +32,9 @@ class Cat(Resource):
 
         return response
 
+
 class CatPics(Resource):
 
     def get(self):
         return send_from_directory('static', 'kitty.png')
+
