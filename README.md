@@ -109,7 +109,7 @@ Once the container is built you can run it using the `docker run` command, and m
 default flask port (5000). To do this you would run the following in the root of your project:
 ```docker run -d -p 5000:5000 flask_demo```
 This will run an instance of the latest version of the flask_demo container in your local registry, which you should now
- be able to access at `http://0.0.0.0:5000/cat`.
+ be able to access at `http://0.0.0.0:5000/cat` and `http://0.0.0.0:5000/cat/pics`.
  
 Once your applications are containerized, it becomes relatively straightforward to scale application resources horizontally 
 by adding more instances in services like AWS Elastic Container Service, docker-compose, or pick-your-favorite Kubernetes 
