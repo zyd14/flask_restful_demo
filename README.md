@@ -172,9 +172,12 @@ requests, although there are a number of good alternatives out there.  `flask_re
 Zappa provides a simple mechanism for creating Lambda functions which can be subscribed to AWS events, SNS & SQS messages,
 and DynamoDB & Kinesis streams. These don't require any flask application - you write a regular Lambda handler, provide 
 a path to it in your `zappa_settings.json` file as well as the event source and then the `zappa deploy/update` commands
-will handle the creation of the function and any necessary CloudWatch Rules or subscriptions. Functions can also be 
-scheduled to run periodically like a cron job. This is actually a topic I will probably expand on quite a bit more in 
-another post, as it makes event-driven / message-passing architectures much easier to build and maintain.
+will handle the creation of the function and any necessary CloudWatch Rules or subscriptions. This allows your function 
+to execute asynchronously whenever it sees a message in a queue / topic / event source it is subscribed to. Functions can 
+also be scheduled to run periodically like a cron job.
+ 
+Event sourcing / subscription processing is a really interesting topic I will probably expand on quite a bit more in 
+another post.
 
 ### Limitations  
 When using `flask-RESTful` to build serverless applications on AWS there are some restrictions to keep in mind:
@@ -187,5 +190,8 @@ To get around this you can deploy your Lambda behind an Automatic Load Balancer 
 or perform asynchronous invocations of your lambda function (zappa provides a great `@task` wrapper for this, importable 
 from `zappa.asynchronous`).
 - Maximum payload that can be received via a call to Lambda is 6MB.  To pass larger datasets you can pass an S3 location 
-and load the data from the Lambda instance (provided it can fit in the 3GB of allotted memory). Maximum response size 
+and load the data from the Lambda instance (provided it can fit in the ~3GB of allotted memory). Maximum response size 
 for API Gateway is 10MB, but the same technique can be used to pass around details of where larger datasets live.
+- Highly bursty / concurrent loads on a Lambda function can take a bit longer to provision and responsiveness will degrade
+relatively quickly in relation to a burst of concurrent executions without configuring Provisioned Concurrency for your 
+function. 
