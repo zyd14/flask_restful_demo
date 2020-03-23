@@ -28,3 +28,7 @@ class TestCatEndpoints:
 
         response = client.post('/cat', data=json.dumps({'something': 'else'}), content_type='application/json')
         assert response.status_code == 400
+
+    def test_homepage(self, client):
+        response = client.get('/')
+        assert response.status_code == 200

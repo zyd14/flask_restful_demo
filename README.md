@@ -7,7 +7,21 @@ routes with HTTP responses. Flask was built to be extendable, so that you would 
 your service.  Popular flask extensions include `Flask-OAuth`,`Flask-Login`, `Flask-SQLAlchemy`, `'flask-RESTful`, and 
 many more.  This post will focus on using `'flask-RESTful` for building RESTful APIs, and will show how to make use of 
 the `zappa` framework to deploy the API to AWS where it is hosted as a serverless lambda function with an API Gateway 
-attached to provide a host url.
+attached to provide a host url.    
+
+It is important to note that while `Flask-RESTful` can serve basic static webpages, was not built to serve dynamic content and
+it better suited to serving as a framework API for frontend applications to communicate with.  It is common practice to 
+connect an nginx or other frontend in your desired language for dynamic rendering of HTML templates using data pulled from 
+a Flask-RESTful backend. Flask-RESTful is best suited to providing a gateway to backend resources like databases and compute applications so your 
+frontend can remain isolated from the backend implementation details and focus on presentation. This has the added benefit
+of allowing you to evolve your frontend separately and even choose a different language to develop it in (JavaScript for example).
+It also also for the possibility of having multiple clients, such as different frontends or remote API users to use the same
+interface for accessing a set of resources (such as a database). Lastly, Flask-RESTful can be very easily designed in a 
+stateless manner, making it easy to deploy in redundancy or as a serverless application if you are working in cloud, lowering
+your cost of infrastructure management. 
+
+####Follow along:
+The source code for all the examples below can be found and downloaded here: 
 
 ### Getting started
 
@@ -21,8 +35,8 @@ app.run()
 ```
 
 This will start a process on localhost port 5000 by default (http://127.0.0.1:5000/), but the host and port can be overriden
-using keyword parameters.  A debug mode is also possible using the debug flag, which can show much more detail about how
-problem requests are being handled on the server.  
+using keyword parameters.  A debug mode is also possible using the debug flag which will print much more detailed information
+regarding calls which cause unexpected crashes within the web app.  
 
 Now this server doesn't do anything yet, because we haven't tied any resources to it yet.  To begin adding endpoints to
 our REST API we first need to use the flask-RESTful extension to create an `Api` object.
@@ -64,6 +78,10 @@ We've just created a resource with both GET and POST request handlers.  The GET 
 and set the Resource `says` class variable to the request-provided parameter.  This way subsequent calls to the GET handler
 should now return the new value set by the POST endpoint (this only holds true for this particular application server instance).
 
+(Note: `jsonify` is a Flask-imported method which creates JSON-formatted string objects from a set of keyword arguments, handling any necessary esacaping.
+       `make_response` is a Flask-imported method which takes a JSON-formatted string and creates a `Response` object with the necessary 
+       headers and other attributes needed to be passed over the internet back to the client.)   
+
 Without being tied to the application, our `Cat` Resource doesn't have any way of interacting with the outside world.  To 
 tie it to our application we can do the following in our `app.py`:
 
@@ -86,22 +104,75 @@ image, or another hosting option your host name and port will need to change.
 
 ### Running locally
 To run an application the user must create instances of Flask App and Api, and then execute the `Api.app.run()` method. 
-In this project the `main.py` file provides a simple entry point to start the application locally via `python main.py`.
+In this project the `main.py` file provides a simple entry point to start the application locally via `python main.py`. 
+This entry point is executed by importing our `api` object created in `/src/app.py`, and executing its `api.app.run()` method.
+This essentially launches an instance of your application which runs on a loop, listening to input from port 5000 of your 
+localhost address (usually 127.0.0.1).  The address and port to which your application will publish is customizable within
+the `api.app.run()` call.
 
 Once you're running locally, you should be able to hit your endpoints using a web browser, `curl` or any other http 
-method using the base URL 
+method using the base URL. 
 
 ### Testing
-Requests against your rest endpoints can be easily simulated using Flask's application test client. In the `tests/conftest.py` 
-module an example is shown where a test client is created as a fixture, so testing modules can create one at run time. Once 
-you have a test client, you can use its `.post()`, `.get()`, `.put()` etc. methods to throw requests of the given type 
-at your endpoint resources. Examples of this can be seen in `tests/test_app.py`, where POST data is included as a jsonified
-dictionary using the `data=` keyword argument.  This comes in super handy for end-to-end request / response testing.
+Requests against your rest endpoints can be easily simulated using Flask's application test client. 
+To create a test client, you can import your Flask `app` object created earlier in the tutorial from your test file, then use
+the `app.test_client()` method to return a mocked flask application with all the same endpoints and functionality (demonstrated
+in the companion repo file `tests/conftest.py`). Once you have a test client, you can use its `.post()`, `.get()`, `.put()` etc.
+methods within your tests to throw requests of the given type at your endpoint resources.  
+
+If you are using `pytest`, a common pattern is to create a test client fixture
+ which you can then import into any functions testing against your endpoints.  
+ 
+ Example:
+(tests/conftest.py)
+```python
+from flask.testing import FlaskClient
+import pytest
+@pytest.fixture(scope='function')
+def client() -> FlaskClient:
+    from src.app import app
+    app.config['TESTING'] = True
+    yield app.test_client()
+
+```
+
+(tests/test_app.py)
+```python
+from flask.testing import FlaskClient
+def test_cat_get_initial(client: FlaskClient):
+
+    response = client.get('/cat')
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body['says'] == 'meow'
+```
+(Can be found in the accompanying repo, `tests/test_app.py`).  Here we have a test which performs a `/get` request against a 
+test client, defined in `tests/conftest.py`.  We are then able to check the status code of the response and that the body
+ contains the information we expected.  This comes in super handy for end-to-end or request / response testing.
 
 ### Running in Docker
-A basic `Dockerfie` has been provided in the root directory which will install the source application into the root of 
-the container, then run the application via the `main.py` entrypoint when the docker container is run.  To build the 
-image run the following in a terminal window from the root of the project:
+Basic Dockerfile:
+```dockerfile
+FROM python:3.8.2-slim
+
+WORKDIR /
+
+COPY src /src
+COPY main.py .
+COPY static /static
+COPY requirements.txt .
+
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+ENV DOCKER_EXE=True
+
+ENTRYPOINT ["python", "main.py"]
+```
+
+
+This basic dockerfile will install the source application into the root of the container, then run the application via 
+the `main.py` entrypoint when the docker container is run.  To build the image run the following in a terminal window from the root of the project:
 
 ```docker build -t flask_demo .```
 
@@ -114,6 +185,10 @@ This will run an instance of the latest version of the flask_demo container in y
 Once your applications are containerized, it becomes relatively straightforward to scale application resources horizontally 
 by adding more instances in services like AWS Elastic Container Service, docker-compose, or pick-your-favorite Kubernetes 
 provider. But that goes beyond the scope of this post.
+
+**Note**: The WSGI server provided by the underlying `Werzkeug` library that Flask heavily leverages is not meant to host 
+production traffic.  If you plan on hosting a website with Flask and expect any sort of traffic you will want to look into 
+solutions like `gunicorn` and `nginx`, both of which can be easily integrated into your docker container. 
 
 ### Deploying to AWS Lambda wth Zappa
 [Zappa](https://github.com/Miserlou/Zappa) is an open-source python framework for building and deploying Lambda functions, with or without API Gateways attached

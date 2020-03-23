@@ -5,10 +5,10 @@ WORKDIR /
 COPY src /src
 COPY main.py .
 COPY static /static
-COPY dockerrequirements.txt .
+COPY requirements.txt .
 
 RUN pip install --upgrade pip
-RUN pip install -r /dockerrequirements.txt
+RUN pip install -r requirements.txt
 
 ENV DOCKER_EXE=True
 
