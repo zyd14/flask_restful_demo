@@ -1,5 +1,5 @@
 Flask==1.1.1
-flask-restx==0.1.1
+flask-restx==0.5.1
 flask-RESTful==0.3.8
 pytest==5.3.5
 zappa==0.50.0
